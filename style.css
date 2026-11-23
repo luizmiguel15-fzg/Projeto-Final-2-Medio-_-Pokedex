@@ -1,0 +1,158 @@
+/* =============================================================================
+   style.css  —  Visual personalizado da Pokédex
+   -----------------------------------------------------------------------------
+   COMO FUNCIONA / COMO LIGAR AO PROGRAMA
+     1. O Main.py chama `carregar_css()` (Systems/estilos.py), logo depois de
+        `st.set_page_config(...)`.
+     2. `carregar_css()` lê ESTE arquivo e o envia ao navegador junto com um
+        trecho de CSS GERADO a partir de Systems/constantes.py. O trecho gerado
+        vem ANTES deste arquivo e define:
+            --cor-hp, --cor-ataque,        cores dos atributos (CORES_INFO)
+            --cor-peso, --cor-altura,
+            --cor-tipo
+            .tipo-fire, .tipo-water, ...   uma classe por tipo (CORES_TIPOS),
+                                           cada uma definindo a variável --cor
+        Por isso as cores NÃO aparecem escritas aqui: para mudá-las, edite
+        Systems/constantes.py.
+     3. As páginas usam as classes deste arquivo: o HTML dos badges e dos chips
+        vem de Systems/estilos.py (Pages/Pokemons.py) e a foto circular vem dos
+        containers com `key=` de Pages/Perfil.py.
+
+   Organização deste arquivo:
+       1. Foto de perfil circular
+       2. Badges de tipo (com ícone)
+       3. Chips de Vida, Ataque, Altura e Peso
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. FOTO DE PERFIL CIRCULAR
+   -----------------------------------------------------------------------------
+   `.st-key-perfil_topo` e `.st-key-perfil_preview` são as classes que o
+   Streamlit cria para os containers com key="perfil_topo" / "perfil_preview"
+   (Pages/Perfil.py): a foto do topo da página e a pré-visualização da nova foto.
+   ============================================================================= */
+
+.st-key-perfil_topo img,
+.st-key-perfil_preview img {
+    width: 100%;                  /* ocupa a largura definida no st.image (120 px / 350 px) */
+    height: auto;
+    aspect-ratio: 1 / 1;          /* força a área da imagem a ser um QUADRADO */
+    object-fit: cover;            /* corta o excesso em vez de esticar/deformar a foto */
+    border-radius: 50%;           /* quadrado + 50% de raio = círculo */
+    border: 3px solid rgba(128, 128, 128, 0.45);
+    max-width: 100%;
+}
+
+
+/* =============================================================================
+   2. BADGES DE TIPO (COM ÍCONE)
+   -----------------------------------------------------------------------------
+   Etiquetas arredondadas com borda, texto e fundo suave na cor do tipo, e o
+   ícone do tipo à esquerda do nome.
+   A cor vem da variável --cor, definida pela classe .tipo-<nome> (gerada).
+   ============================================================================= */
+
+/* Linha que agrupa os badges e quebra para a linha de baixo se faltar espaço. */
+.tipos-linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.2rem 0 0.6rem 0;
+}
+
+/* ATENÇÃO: aqui NÃO se define --cor. A cor de cada tipo vem da classe gerada
+   (.tipo-fire etc.), que fica ANTES deste arquivo; definir --cor aqui a
+   sobrescreveria e todos os badges ficariam da mesma cor. O `var(--cor, #888888)`
+   usa o cinza apenas como reserva, caso nenhuma classe de tipo seja aplicada. */
+.tipo-badge {
+    display: inline-flex;         /* ícone e texto lado a lado */
+    align-items: center;          /* centralizados na vertical */
+    gap: 0.4rem;                  /* espaço entre o ícone e o nome */
+    padding: 0.15rem 0.85rem 0.15rem 0.6rem;
+    border-radius: 999px;         /* ponta totalmente arredondada (formato de pílula) */
+    border: 2px solid var(--cor, #888888);
+    color: var(--cor, #888888);
+    /* fundo = a mesma cor com 15% de opacidade */
+    background: color-mix(in srgb, var(--cor, #888888) 15%, transparent);
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-transform: lowercase;
+}
+
+/* Ícone do tipo (imagem SVG carregada da internet; veja URL_ICONES_TIPOS). */
+.tipo-icone {
+    width: 1.2em;                 /* acompanha o tamanho da letra do badge (o mesmo tamanho vai inline no HTML) */
+    height: 1.2em;
+    flex-shrink: 0;               /* não deixa o ícone ser espremido */
+}
+
+/* Tipo que não está na lista de cores: usa a cor neutra --cor-tipo (CORES_INFO). */
+.tipo-desconhecido {
+    --cor: var(--cor-tipo, #888888);
+}
+
+
+/* =============================================================================
+   3. CHIPS DE VIDA, ATAQUE, ALTURA E PESO
+   -----------------------------------------------------------------------------
+   Cada chip mostra "Rótulo  valor": o rótulo na cor normal do texto e o valor
+   em negrito na cor do atributo (--cor-hp, --cor-ataque, --cor-altura ou
+   --cor-peso, definidas em Systems/constantes.py > CORES_INFO).
+   ============================================================================= */
+
+/* Bloco com as duas linhas de chips (Vida+Ataque e Altura+Peso). */
+.stats-bloco {
+    margin: 0 0 0.6rem 0;
+}
+
+/* Uma linha de chips; quebra para baixo se faltar espaço. */
+.stats-linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+/* Mesma regra dos badges: --cor vem de .stat-hp / .stat-ataque / etc.
+   (abaixo); o cinza é só reserva. */
+.stat-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 0.6rem;
+    border-left: 4px solid var(--cor, #888888);        /* faixa colorida na lateral */
+    background: color-mix(in srgb, var(--cor, #888888) 14%, transparent);
+}
+
+/* Cada atributo escolhe a SUA cor. */
+.stat-hp {
+    --cor: var(--cor-hp);
+}
+
+.stat-ataque {
+    --cor: var(--cor-ataque);
+}
+
+.stat-altura {
+    --cor: var(--cor-altura);
+}
+
+.stat-peso {
+    --cor: var(--cor-peso);
+}
+
+/* Nome do atributo ("Vida", "Ataque"...): um pouco menor e mais discreto. */
+.stat-rotulo {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+/* Valor do atributo: grande, em negrito e na cor do atributo. */
+.stat-valor {
+    color: var(--cor, inherit);
+    font-weight: 800;
+    font-size: 1.15rem;
+}
